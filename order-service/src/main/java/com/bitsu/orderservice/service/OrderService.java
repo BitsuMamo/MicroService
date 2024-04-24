@@ -6,6 +6,7 @@ import com.bitsu.orderservice.dto.OrderResponse;
 import com.bitsu.orderservice.model.Order;
 import com.bitsu.orderservice.model.OrderLineItem;
 import com.bitsu.orderservice.repository.OrderRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Service
 @Slf4j
+@Transactional
 public class OrderService {
 
     private final OrderRepository orderRepository;
