@@ -1,5 +1,6 @@
 package com.bitsu.orderservice.service;
 
+import com.bitsu.orderservice.dto.InventoryResponse;
 import com.bitsu.orderservice.dto.OrderLineItemDto;
 import com.bitsu.orderservice.dto.OrderRequest;
 import com.bitsu.orderservice.dto.OrderResponse;
@@ -10,7 +11,10 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -22,6 +26,7 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final WebClient webClient;
     public void placeOrder(OrderRequest orderRequest){
 
         Order order = Order.builder()
@@ -38,7 +43,22 @@ public class OrderService {
                     orderLineItem.setOrder(order);
                 });
 
-        orderRepository.save(order);
+        var skuCodes = order.getOrderLineItemsList().stream()
+                        .map(OrderLineItem::getSkuCode)
+                        .toList();
+
+        InventoryResponse[] inventoryResponse = webClient.get()
+                .uri("http://localhost:8082/api/inventory", uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
+                .retrieve()
+                .bodyToMono(InventoryResponse[].class)
+                .block();
+
+        boolean allProductsInStock = Arrays.stream(inventoryResponse).allMatch(InventoryResponse::isInStock);
+
+        if(allProductsInStock)
+            orderRepository.save(order);
+        else
+            throw new RuntimeException("Some Products are Not in stock");
     }
 
     public OrderResponse getOrder(Long id) {
