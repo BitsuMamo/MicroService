@@ -7,6 +7,9 @@ import com.bitsu.orderservice.dto.OrderResponse;
 import com.bitsu.orderservice.model.Order;
 import com.bitsu.orderservice.model.OrderLineItem;
 import com.bitsu.orderservice.repository.OrderRepository;
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.discovery.DiscoveryClient;
+import com.netflix.discovery.EurekaClient;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +30,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final WebClient webClient;
+    private final EurekaClient discoveryClient;
     public void placeOrder(OrderRequest orderRequest){
 
         Order order = Order.builder()
@@ -46,9 +50,14 @@ public class OrderService {
         var skuCodes = order.getOrderLineItemsList().stream()
                         .map(OrderLineItem::getSkuCode)
                         .toList();
+        InstanceInfo instanceInfo = discoveryClient.getNextServerFromEureka("inventory-service", false);
+        System.out.println(instanceInfo);
+        String URL = String.format("http://%s:%s/api/inventory",instanceInfo.getHostName(), instanceInfo.getPort());
+        System.out.println(URL);
 
         InventoryResponse[] inventoryResponse = webClient.get()
-                .uri("http://localhost:8082/api/inventory", uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
+                .uri(URL , uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
+
                 .retrieve()
                 .bodyToMono(InventoryResponse[].class)
                 .block();
