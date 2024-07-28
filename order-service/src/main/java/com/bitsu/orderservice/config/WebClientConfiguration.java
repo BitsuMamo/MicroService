@@ -25,30 +25,4 @@ public class WebClientConfiguration {
       return WebClient.builder().build();
    }
 
-//   @Bean
-//   public DiscoveryClient discoveryClient(ApplicationInfoManager applicationInfoManager, EurekaClientConfig config, TransportClientFactories transportClientFactories) {
-//      return new DiscoveryClient(applicationInfoManager, config, transportClientFactories);
-//   }
-//
-//   @Bean
-//   public ApplicationInfoManager applicationInfoManager(EurekaInstanceConfig config) {
-//      InstanceInfo instanceInfo = new InstanceInfoFactory().create(config);
-//      return new ApplicationInfoManager(config, instanceInfo);
-//   }
-//
-//   @Bean
-//   public EurekaInstanceConfig eurekaInstanceConfig() {
-//      return new CloudInstanceConfig();
-//   }
-//
-//   @Bean
-//   public EurekaClientConfig eurekaClientConfig() {
-//      return new DefaultEurekaClientConfig();
-//   }
-//
-//   @Bean
-//   public TransportClientFactories transportClientFactories() {
-//      return new WebClientTransportClientFactories(WebClient::builder);
-//   }
-
 }

@@ -50,9 +50,10 @@ public class OrderService {
         var skuCodes = order.getOrderLineItemsList().stream()
                         .map(OrderLineItem::getSkuCode)
                         .toList();
+
         InstanceInfo instanceInfo = discoveryClient.getNextServerFromEureka("inventory-service", false);
         System.out.println(instanceInfo);
-        String URL = String.format("http://%s:%s/api/inventory",instanceInfo.getHostName(), instanceInfo.getPort());
+        String URL = String.format("http://%s:%s/api/inventory",instanceInfo.getIPAddr(), instanceInfo.getPort());
         System.out.println(URL);
 
         InventoryResponse[] inventoryResponse = webClient.get()
@@ -61,6 +62,8 @@ public class OrderService {
                 .retrieve()
                 .bodyToMono(InventoryResponse[].class)
                 .block();
+
+        System.out.println(inventoryResponse);
 
         boolean allProductsInStock = Arrays.stream(inventoryResponse).allMatch(InventoryResponse::isInStock);
 
