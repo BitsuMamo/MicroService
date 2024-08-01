@@ -9,9 +9,11 @@ springdoc:
     operations-sorter: method
 
 server:
-  port: 8080
+  port: 0
 eureka:
   client:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:8761/eureka
+    instance:
+      hostname: Happy.mshome.net

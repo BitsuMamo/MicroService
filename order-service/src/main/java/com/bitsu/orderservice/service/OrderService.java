@@ -53,7 +53,7 @@ public class OrderService {
 
         InstanceInfo instanceInfo = discoveryClient.getNextServerFromEureka("inventory-service", false);
         System.out.println(instanceInfo);
-        String URL = String.format("http://%s:%s/api/inventory",instanceInfo.getIPAddr(), instanceInfo.getPort());
+        String URL = String.format("http://%s:%s/api/inventory",instanceInfo.getHostName(), instanceInfo.getPort());
         System.out.println(URL);
 
         InventoryResponse[] inventoryResponse = webClient.get()
@@ -63,7 +63,7 @@ public class OrderService {
                 .bodyToMono(InventoryResponse[].class)
                 .block();
 
-        System.out.println(inventoryResponse);
+        System.out.println(Arrays.toString(inventoryResponse));
 
         boolean allProductsInStock = Arrays.stream(inventoryResponse).allMatch(InventoryResponse::isInStock);
 
